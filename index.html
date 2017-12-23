@@ -1,310 +1,202 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <title>Testing Revisit UI</title>
-    <script src="https://unpkg.com/vue"></script>
-    <style type="text/css">
-        #vueapp {
-            width: 80%;
-            margin: 2rem auto;
-            position: relative;
-        }
-        #canvas-element {
-            width: 100%;
-            height: 500px;
-            border: 1px solid black;
-        }
-        #controls {
-            width: 100%;
-            display: flex;
-            align-items: center;
-            position: absolute;
-            bottom: 5px;
-        }
-/*        #controls:hover {
-            height: 60px;
-        }*/
-        #play-pause {
-            flex: 0 0 5%;
-            background: transparent;
-            border: none;
-            outline: none;
-            text-align: center;
-        }
-        #time-text {
-            flex: 0 0 5%;
-            background: transparent;
-            text-align: right;
-            /*padding: : 0 0.5rem 0 0;
-            margin: 0;*/
-        }
-        #time-text span {
-            margin-right: 0.5rem;
-        }
-        #playback-speed {
-            flex: 0 0 10%;
-        }
-        #playback-speed input {
-            width: 100%;
-            margin: 0;
-            padding: 0;
-        }
-        #timeline {
-            flex: 0 0 80%;
-    background: -webkit-linear-gradient(left, rgba(0, 225, 255, 0.4) 0%, rgba(0, 225, 255, 0.1) 1%);
-    background: -moz-linear-gradient(left, rgba(0, 225, 255, 0.4) 0%, rgba(0, 225, 255, 0.1) 1%);
-    background: -ms-linear-gradient(left, rgba(0, 225, 255, 0.4) 0%, rgba(0, 225, 255, 0.1) 1%);
-    background: linear-gradient(left, rgba(0, 225, 255, 0.4) 0%, rgba(0, 225, 255, 0.1) 1%);
-            border-radius: 10px;
-            height: 13px;
-        }
+  <meta charset="utf-8">
+  <title>Testing Revisit UI</title>
+  <script src="https://unpkg.com/vue"></script>
+  <style type="text/css">
+  #container {
+    width: 80%;
+    margin: 2rem auto;
+    position: relative;
+  }
 
-        #play-pause, #timeline {
-            margin: 0;
-            padding: 0;
-        }
-    </style>
+
+  #canvas {
+    width: 100%;
+    height: 500px;
+  }
+
+
+  #controls {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    position: absolute;
+    bottom: 0;
+    margin: 0;
+    padding: 0;
+  }
+  #controls:hover {
+    background: rgba(200, 200, 200, 0.25);
+  }
+
+
+  #play-pause {
+    flex: 0 0 10%;
+    background: transparent;
+    border: none;
+    outline: none;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+  }
+  #play-pause svg {
+    width: 100%;
+    max-width: 50px;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    border: none;
+    outline: none;
+  }
+
+
+  #timeline-label {
+    flex: 0 0 10%;
+    background: transparent;
+    text-align: right;
+    padding: 0;
+    margin: 0;
+  }
+  #timeline-label span {
+    margin: 0 0.5rem 0 0;
+  }
+
+
+  #playback-speed {
+    flex: 0 0 15%;
+  }
+  #playback-speed input {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+
+  #playback-speed-label {
+    flex: 0 0 5%;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+  }
+
+
+  #timeline {
+    flex: 1;
+    margin: 0;
+    padding: 0;
+  }
+  #timeline input {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+</style>
 </head>
 <body>
 
-    <div id="vueapp">
-        <canvas id="canvas-element"></canvas>
-        <div id="controls" class="flxgrid">
+  <div id="container">
+    <canvas id="canvas"></canvas>
 
-            <div id="play-pause" v-on:click="isPlaying = !isPlaying" v-bind:class="{ 'play-pause-playing': isPlaying }">
-                <i class="play-pause-icon"><div class="play-pause-mask"></div></i>
-            </div>
+    <div id="controls" class="flxgrid">
 
-            <div id="time-text">
-                <span>{{formatTime(time)}} / {{totalTime}}</span>
-            </div>
+      <div id="play-pause" v-on:click="isPlaying = !isPlaying">
+        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 100 100" version="1.1">
+          <!-- Left -->
+          <polygon points="10 10, 50 30, 50 70, 10 90">
+            <animate dur="0.3s" begin="startAnimation.begin" attributeName="points" values="10 10, 50 30, 50 70, 10 90; 10 10, 45 20, 45 80, 10 90; 10 10, 40 10, 40 90, 10 90" fill="freeze" />
+            <animate dur="0.3s" begin="reverseAnimation.begin" attributeName="points" values="10 10, 40 10, 40 90, 10 90; 10 10, 45 20, 45 80, 10 90; 10 10, 50 30, 50 70, 10 90" fill="freeze" />
+          </polygon>
+          <!-- Right -->
+          <polygon points="50 30, 90 50, 90 50, 50 70">
+            <animate dur="0.3s" begin="startAnimation.begin" attributeName="points" values="50 30, 90 50, 90 50, 50 70; 55 20, 90 30, 90 70, 55 80; 60 10, 90 10, 90 90, 60 90" fill="freeze" />
+            <animate dur="0.3s" begin="reverseAnimation.begin" attributeName="points" values="60 10, 90 10, 90 90, 60 90; 55 20, 90 30, 90 70, 55 80; 50 30, 90 50, 90 50, 50 70" fill="freeze" />
+          </polygon>
+          <!-- Invisivle rects as controls-->
+          <rect x="0" y="0" height="100" width="100" fill-opacity="0">
+            <animate dur="0.01s" id="startAnimation" attributeName="width" values="100; 0" fill="freeze" begin="click" />
+            <animate dur="0.01s" attributeName="width" values="0; 100" fill="freeze" begin="reverseAnimation.end" />
+          </rect>
+          <rect x="0" y="0" height="100" width="0" r="0" fill-opacity="0">
+            <animate dur="0.001s" id="reverseAnimation" attributeName="width" values="100; 0" fill="freeze" begin="click" />
+            <animate dur="0.001s" attributeName="width" values="0; 100" begin="startAnimation.end"  fill="freeze"  />
+          </rect>
+        </svg>
+      </div>
 
-            <div id="playback-speed">
-                <input type="range" name="speed-slider" min="-5" max="5" step="0.1" v-model.number="speed">
-            </div>
+      <div id="timeline-label">
+        <span>{{formatTime(time)}} / {{totalTime}}</span>
+      </div>
 
-            <div id="timeline">
-                <input id="timeline-slider" class="timeline-slider" type="range" name="timeline-slider" min="0" max="10" step="0.01" v-model.number="time">
-            </div>
-        </div>
+      <div id="playback-speed">
+        <input id="playback-speed-slider" type="range" name="playback-speed-slider" min="-5" max="5" step="0.1" v-model.number="speed">
+      </div>
+
+      <div id="playback-speed-label">
+        {{speed | formatSpeed}}
+      </div>
+
+      <div id="timeline">
+        <input id="timeline-slider" type="range" name="timeline-slider" min="0" max="10" step="0.01" v-model.number="time">
+      </div>
+
     </div>
+  </div>
 
-    <script type="text/javascript">
+  <script type="text/javascript">
 
-        let vueapp = new Vue({
-            el: "#vueapp",
-            data: {
-                isPlaying: false,
-                time: 0,
-                totalTime: 10,
-                speed: 1
-            },
-            methods: {
-              formatTime: function (t) {
-                return t.toFixed(2);
-              }
-            }
-        });
+  let canvas = document.getElementById("canvas");
+  let ctx = canvas.getContext("2d");
+  ctx.fillStyle = "rgba(0,0,100,0.1)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 
 
-let updatePeriod = 1/60;
-
-
-let timeline = document.getElementById("timeline-slider");
-var changing = false;
-timeline.addEventListener("mousedown", function () {
-    changing = true;
-})
-timeline.addEventListener("mouseup", function () {
-    changing = false;
-})
-
-
-function doSomething() {
-    if (!changing && vueapp.isPlaying) {
-        vueapp.time += updatePeriod * vueapp.speed;
-        vueapp.time = Math.max(0, Math.min(vueapp.time, vueapp.totalTime));
+  let vueapp = new Vue({
+    el: "#controls",
+    data: {
+      isPlaying: false,
+      time: 0,
+      totalTime: 10,
+      speed: 1
+    },
+    methods: {
+      formatTime: function (t) {
+        return t.toFixed(2);
+      }
+    },
+    filters: {
+      formatSpeed: function(s) {
+        return "x" + s.toFixed(1);
+      }
     }
-        let p = vueapp.time / vueapp.totalTime * 100;
-        document.getElementById("timeline").style.background =
-            "-moz-linear-gradient(left, rgba(0, 225, 255, 0.4) " + p + "%, rgba(0, 225, 255, 0.1) " + (p+0.5) + "%)";
-}
-doSomething();
-setInterval(doSomething, updatePeriod * 1000);
+  });
 
 
-    </script>
+  let updatePeriod = 1/60;
 
-    <style type="text/css">
+  let timeline = document.getElementById("timeline-slider");
+  var changing = false;
+  timeline.addEventListener("mousedown", function () {
+    changing = true;
+  });
+  timeline.addEventListener("mouseup", function () {
+    changing = false;
+  });
 
-
-
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-    /* display: none; <- Crashes Chrome on hover */
-    -webkit-appearance: none;
-    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
-}
-
-
-        .play-pause-icon {
-            height: 30px;
-            width: 30px;
-            line-height: 30px;
-            position: relative;
-            z-index: 0;
-            box-sizing: border-box;
-            display: inline-block;
-            overflow: hidden;
-        }
-        .play-pause-icon:before, .play-pause-icon:after {
-            content: '';
-            position: absolute;
-            transition: 0.3s;
-            background: #777;
-            height: 100%;
-            width: 50%;
-            top: 0;
-        }
-        .play-pause-icon:before {
-            left: 0;
-        }
-        .play-pause-icon:after {
-            right: 0;
-        }
-        .play-pause-mask {
-            position: absolute;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            display: block;
-        }
-        .play-pause-mask:before, .play-pause-mask:after {
-            content: '';
-            position: absolute;
-            left: 0;
-            height: 100%;
-            width: 150%;
-            background: #FFF;
-            transition: all 0.3s ease-out;
-        }
-        .play-pause-mask:before {
-            top: -100%;
-            transform-origin: 0% 100%;
-            transform: rotate(26.5deg);
-        }
-        .play-pause-mask:after {
-            transform-origin: 0% 0%;
-            transform: rotate(-26.5deg);
-            top: 100%;
-        }
-        .play-pause-playing .play-pause-icon:before {
-            transform: translateX(-25%);
-        }
-        .play-pause-playing .play-pause-icon:after {
-            transform: translateX(25%);
-        }
-        .play-pause-playing .play-pause-mask:before, .play-pause-playing .play-pause-mask:after {
-            transform: rotate(0);
-        }
+  function doSomething() {
+    if (!changing && vueapp.isPlaying) {
+      vueapp.time += updatePeriod * vueapp.speed;
+      vueapp.time = Math.max(0, Math.min(vueapp.time, vueapp.totalTime));
+    }
+  }
+  doSomething();
+  setInterval(doSomething, updatePeriod * 1000);
 
 
-input[type=range].timeline-slider::-moz-focus-outer {
-    border: 0;
-}
-input[type=range].timeline-slider {
-  -webkit-appearance: none;
-  width: 100%;
-  margin: 0;
-  padding: 0;
-}
-input[type=range].timeline-slider:focus {
-  outline: none;
-}
-input[type=range].timeline-slider::-webkit-slider-runnable-track {
-  width: 100%;
-  height: 0px;
-  cursor: pointer;
-  box-shadow: 0px 0px 0px rgba(0, 0, 0, 0), 0px 0px 0px rgba(13, 13, 13, 0);
-  background: rgba(0, 0, 0, 0);
-  border-radius: 0px;
-  border: 0px solid rgba(1, 1, 1, 0);
-}
-input[type=range].timeline-slider::-webkit-slider-thumb {
-  box-shadow: 0px 0px 0px rgba(0, 0, 0, 0), 0px 0px 0px rgba(13, 13, 13, 0);
-  border: 0px solid rgba(0, 0, 0, 0);
-  height: 10px;
-  width: 10px;
-  border-radius: 0px;
-  background: rgba(51, 51, 51, 0.75);
-  cursor: pointer;
-  -webkit-appearance: none;
-  margin-top: -5px;
-}
-input[type=range].timeline-slider:focus::-webkit-slider-runnable-track {
-  background: rgba(0, 0, 0, 0);
-}
-input[type=range].timeline-slider::-moz-range-track {
-  width: 100%;
-  height: 0px;
-  cursor: pointer;
-  box-shadow: 0px 0px 0px rgba(0, 0, 0, 0), 0px 0px 0px rgba(13, 13, 13, 0);
-  background: rgba(0, 0, 0, 0);
-  border-radius: 0px;
-  border: 0px solid rgba(1, 1, 1, 0);
-}
-input[type=range].timeline-slider::-moz-range-thumb {
-  box-shadow: 0px 0px 0px rgba(0, 0, 0, 0), 0px 0px 0px rgba(13, 13, 13, 0);
-  border: 0px solid rgba(0, 0, 0, 0);
-  height: 10px;
-  width: 10px;
-  border-radius: 0px;
-  background: rgba(51, 51, 51, 0.75);
-  cursor: pointer;
-}
-input[type=range].timeline-slider::-ms-track {
-  width: 100%;
-  height: 0px;
-  cursor: pointer;
-  background: transparent;
-  border-color: transparent;
-  color: transparent;
-}
-input[type=range].timeline-slider::-ms-fill-lower {
-  background: rgba(0, 0, 0, 0);
-  border: 0px solid rgba(1, 1, 1, 0);
-  border-radius: 0px;
-  box-shadow: 0px 0px 0px rgba(0, 0, 0, 0), 0px 0px 0px rgba(13, 13, 13, 0);
-}
-input[type=range].timeline-slider::-ms-fill-upper {
-  background: rgba(0, 0, 0, 0);
-  border: 0px solid rgba(1, 1, 1, 0);
-  border-radius: 0px;
-  box-shadow: 0px 0px 0px rgba(0, 0, 0, 0), 0px 0px 0px rgba(13, 13, 13, 0);
-}
-input[type=range].timeline-slider::-ms-thumb {
-  box-shadow: 0px 0px 0px rgba(0, 0, 0, 0), 0px 0px 0px rgba(13, 13, 13, 0);
-  border: 0px solid rgba(0, 0, 0, 0);
-  height: 10px;
-  width: 10px;
-  border-radius: 0px;
-  background: rgba(51, 51, 51, 0.75);
-  cursor: pointer;
-  height: 0px;
-}
-input[type=range].timeline-slider:focus::-ms-fill-lower {
-  background: rgba(0, 0, 0, 0);
-}
-input[type=range].timeline-slider:focus::-ms-fill-upper {
-  background: rgba(0, 0, 0, 0);
-}
+</script>
 
-
-
-    </style>
 
 </body>
 </html>
