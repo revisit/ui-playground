@@ -3,94 +3,131 @@
 <head>
   <meta charset="utf-8">
   <title>Testing Revisit UI</title>
-  <script src="https://unpkg.com/vue"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/7.0.0/normalize.min.css">
+
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons">
+
+  <link href="https://unpkg.com/vuetify/dist/vuetify.min.css" rel="stylesheet">
+
   <style type="text/css">
-  #container {
-    width: 80%;
-    margin: 2rem auto;
-    position: relative;
+
+  html, body {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
   }
 
+  #container {
+    width: 100%;
+    height: 100%;
+
+    display: grid;
+    grid-gap: 3px;
+    grid-template-columns: repeat(12, 1fr);
+    grid-template-rows: auto 50px;
+    align-items: center;
+  }
 
   #canvas {
     width: 100%;
-    height: 500px;
+    height: 100%;
+
+    grid-column: 1 / -1;
+    grid-row: 1 / -1;
+
+    z-index: 0;
   }
 
+  #user-interface {
+    width: 100%;
+    height: 100%;
+
+    grid-column: 1 / -1;
+    grid-row: 1 / -1;
+    z-index: 1;
+
+    display: grid;
+    grid-gap: 3px;
+    grid-template-columns: repeat(12, 1fr);
+    grid-template-rows: auto 50px;
+    align-items: center;
+  }
+
+  #controls-cell {
+    grid-column: 1 / -1;
+    grid-row: 2 / -1;
+  }
 
   #controls {
-    width: 100%;
+
     display: flex;
     align-items: center;
-    position: absolute;
-    bottom: 0;
-    margin: 0;
-    padding: 0;
+    justify-content: space-around;
+
+    max-width: 600px;
+    font-size: 0.8rem;
+    padding-top: 0.2rem;
+    margin: 0 auto;
+
+    border-radius: 5px;
+    opacity: 0.3;
+    transition: opacity 0.25s ease-in-out;
+    background: rgba(255, 255, 255, 0.8);
   }
+
   #controls:hover {
-    background: rgba(200, 200, 200, 0.25);
+    opacity: 1.0;
   }
 
-
-  #play-pause {
+  #play-pause, #settings {
     flex: 0 0 10%;
-    background: transparent;
-    border: none;
-    outline: none;
+    max-width: 40px;
     text-align: center;
-    margin: 0;
-    padding: 0;
+    line-height: 0;
   }
-  #play-pause svg {
-    width: 100%;
-    max-width: 50px;
-    margin: 0;
-    padding: 0;
-    background: transparent;
-    border: none;
-    outline: none;
-  }
-
-
-  #timeline-label {
-    flex: 0 0 10%;
-    background: transparent;
-    text-align: right;
-    padding: 0;
-    margin: 0;
-  }
-  #timeline-label span {
-    margin: 0 0.5rem 0 0;
-  }
-
 
   #playback-speed {
-    flex: 0 0 15%;
+    flex: 0 0 20%;
   }
-  #playback-speed input {
-    width: 100%;
-    margin: 0;
-    padding: 0;
-  }
-
-
-  #playback-speed-label {
-    flex: 0 0 5%;
-    text-align: center;
-    margin: 0;
-    padding: 0;
-  }
-
 
   #timeline {
-    flex: 1;
-    margin: 0;
-    padding: 0;
+    flex: 0 0 50%;
   }
-  #timeline input {
+
+  #timeline-text {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  #timeline-left, #timeline-right {
+    flex: 0 0 45%;
+  }
+
+  #timeline-right {
+    text-align: right;
+  }
+
+  #controls input {
     width: 100%;
-    margin: 0;
-    padding: 0;
+  }
+
+  #settings-page {
+    grid-column: 1 / -1;
+    grid-row: 1 / 2;
+    background: red;
+  }
+
+  .hide-mobile {
+    display: none;
+  }
+
+  @media (min-width: 610px) {
+    .hide-mobile {
+      display: unset;
+    }
   }
 
 </style>
@@ -98,101 +135,176 @@
 <body>
 
   <div id="container">
+
     <canvas id="canvas"></canvas>
 
-    <div id="controls" class="flxgrid">
+    <div id="user-interface">
 
-      <div id="play-pause" v-on:click="isPlaying = !isPlaying">
-        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 100 100" version="1.1">
-          <!-- Left -->
-          <polygon points="10 10, 50 30, 50 70, 10 90">
-            <animate dur="0.3s" begin="startAnimation.begin" attributeName="points" values="10 10, 50 30, 50 70, 10 90; 10 10, 45 20, 45 80, 10 90; 10 10, 40 10, 40 90, 10 90" fill="freeze" />
-            <animate dur="0.3s" begin="reverseAnimation.begin" attributeName="points" values="10 10, 40 10, 40 90, 10 90; 10 10, 45 20, 45 80, 10 90; 10 10, 50 30, 50 70, 10 90" fill="freeze" />
-          </polygon>
-          <!-- Right -->
-          <polygon points="50 30, 90 50, 90 50, 50 70">
-            <animate dur="0.3s" begin="startAnimation.begin" attributeName="points" values="50 30, 90 50, 90 50, 50 70; 55 20, 90 30, 90 70, 55 80; 60 10, 90 10, 90 90, 60 90" fill="freeze" />
-            <animate dur="0.3s" begin="reverseAnimation.begin" attributeName="points" values="60 10, 90 10, 90 90, 60 90; 55 20, 90 30, 90 70, 55 80; 50 30, 90 50, 90 50, 50 70" fill="freeze" />
-          </polygon>
-          <!-- Invisivle rects as controls-->
-          <rect x="0" y="0" height="100" width="100" fill-opacity="0">
-            <animate dur="0.01s" id="startAnimation" attributeName="width" values="100; 0" fill="freeze" begin="click" />
-            <animate dur="0.01s" attributeName="width" values="0; 100" fill="freeze" begin="reverseAnimation.end" />
-          </rect>
-          <rect x="0" y="0" height="100" width="0" r="0" fill-opacity="0">
-            <animate dur="0.001s" id="reverseAnimation" attributeName="width" values="100; 0" fill="freeze" begin="click" />
-            <animate dur="0.001s" attributeName="width" values="0; 100" begin="startAnimation.end"  fill="freeze"  />
-          </rect>
-        </svg>
+      <div id="controls-cell">
+        <div id="controls">
+
+          <div id="play-pause" v-on:click="isPlaying = !isPlaying">
+
+            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" version="1.1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <!-- Left -->
+              <polygon fill="none" points="5 3 19 12 5 21 5 3">
+                <animate dur="0.3s" begin="startAnimation.begin" attributeName="points" values="5   3   19   12  5   21   5    3; 5.5 3.5 14.5  8  7.5 20.5 5.5 11.5; 6   4   10    4 10   20   6   20" fill="freeze" />
+                <animate dur="0.3s" begin="reverseAnimation.begin" attributeName="points" values="6   4   10    4 10   20   6   20; 5.5 3.5 14.5  8  7.5 20.5 5.5 11.5; 5   3   19   12  5   21   5    3" fill="freeze" />
+              </polygon>
+              <!-- Right -->
+              <polygon fill="none" points="5 3 19 12 5 21 5 3">
+                <animate dur="0.3s" begin="startAnimation.begin" attributeName="points" values="5   3   19   12  5   21    5    3; 9.5 3.5 18.5  8 11.5 20.5  9.5 11.5; 14  4   18    4 18   20   14   20" fill="freeze" />
+                <animate dur="0.3s" begin="reverseAnimation.begin" attributeName="points" values="14  4   18    4 18   20   14   20; 9.5 3.5 18.5  8 11.5 20.5  9.5 11.5; 5   3   19   12  5   21   5    3" fill="freeze" />
+              </polygon>
+              <!-- Invisivle rects as controls-->
+              <rect stroke-width="0" x="0" y="0" height="24" width="24" fill-opacity="0">
+                <animate dur="0.01s" id="startAnimation" attributeName="width" values="24; 0" fill="freeze" begin="click" />
+                <animate dur="0.01s" attributeName="width" values="0; 24" fill="freeze" begin="reverseAnimation.end" />
+              </rect>
+              <rect stroke-width="0" x="0" y="0" height="24" width="0" r="0" fill-opacity="0">
+                <animate dur="0.01s" id="reverseAnimation" attributeName="width" values="24; 0" fill="freeze" begin="click" />
+                <animate dur="0.01s" attributeName="width" values="0; 24" begin="startAnimation.end"  fill="freeze"  />
+              </rect>
+            </svg>
+
+
+          </div>
+
+          <div id="playback-speed">
+            <div>
+              <span><span class="hide-mobile">Speed: </span>{{speed | formatSpeed}}</span>
+            </div>
+            <input id="playback-speed-slider" type="range" name="playback-speed-slider" min="-5" max="5" step="0.5" v-model.number="speed">
+          </div>
+
+          <div id="timeline">
+            <div id="timeline-text">
+              <div id="timeline-left">
+                <span><span class="hide-mobile">Time: </span>{{formatTime(time)}}<span class="hide-mobile"> / {{totalTime}}</span></span>
+              </div>
+              <div id="timeline-right">
+                <span>{{formatTime(totalTime - time)}}</span>
+              </div>
+            </div>
+            <input id="timeline-slider" type="range" name="timeline-slider" min="0" max="10" step="0.01" v-model.number="time">
+          </div>
+
+          <!-- <div id="settings" v-on:click="displaySettings()"> -->
+          <div id="settings" v-on:click="showSettings = !showSettings">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-settings">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+          </div>
+
+        </div>
       </div>
 
-      <div id="timeline-label">
-        <span>{{formatTime(time)}} / {{totalTime}}</span>
-      </div>
+      <div id="settings-page" v-show="showSettings" class="md-elevation-10">
+        Hello
+        <md-icon>play_arrow</md-icon>
+        <md-icon>settings</md-icon>
+        <md-icon>code</md-icon>
+        <md-icon>fast_forward</md-icon>
+        <md-icon>fast_rewind</md-icon>
+        <md-icon>forward_10</md-icon>
+        <md-icon>forward_30</md-icon>
+        <md-icon>forward_5</md-icon>
+        <md-icon>pause</md-icon>
+        <md-icon>replay_10</md-icon>
+        <md-icon>replay_30</md-icon>
+        <md-icon>replay_5</md-icon>
+        <md-icon>replay</md-icon>
+        <!-- clear -->
+        <!-- close -->
+        <!-- add -->
+        <!-- undo -->
+        <!-- redo -->
+        <!-- record -->
+        <!-- menu -->
+        <!-- fullscreen -->
 
-      <div id="playback-speed">
-        <input id="playback-speed-slider" type="range" name="playback-speed-slider" min="-5" max="5" step="0.1" v-model.number="speed">
-      </div>
 
-      <div id="playback-speed-label">
-        {{speed | formatSpeed}}
-      </div>
-
-      <div id="timeline">
-        <input id="timeline-slider" type="range" name="timeline-slider" min="0" max="10" step="0.01" v-model.number="time">
       </div>
 
     </div>
+
   </div>
+
+
+  <script src="https://unpkg.com/vue/dist/vue.js"></script>
+  <script src="https://unpkg.com/vuetify/dist/vuetify.js"></script>
 
   <script type="text/javascript">
 
-  let canvas = document.getElementById("canvas");
-  let ctx = canvas.getContext("2d");
-  ctx.fillStyle = "rgba(0,0,100,0.1)";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-
-  let vueapp = new Vue({
-    el: "#controls",
-    data: {
-      isPlaying: false,
-      time: 0,
-      totalTime: 10,
-      speed: 1
-    },
-    methods: {
-      formatTime: function (t) {
-        return t.toFixed(2);
+    let vueapp = new Vue({
+      el: "#user-interface",
+      data: {
+        isPlaying: false,
+        time: 0,
+        totalTime: 10,
+        speed: 1,
+        showSettings: false
+      },
+      methods: {
+        formatTime: function (t) {
+          return t.toFixed(2);
+        },
+        displaySettings: function () {
+          console.log(this.showSettings);
+          this.showSettings = !this.showSettings;
+        }
+      },
+      filters: {
+        formatSpeed: function(s) {
+          return "x " + s.toFixed(1);
+        }
       }
-    },
-    filters: {
-      formatSpeed: function(s) {
-        return "x" + s.toFixed(1);
+    });
+
+    let canvas = document.getElementById("canvas");
+    let ctx = canvas.getContext("2d");
+    let rect_size = 50;
+
+    function draw() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      ctx.fillStyle = "rgba(0,0,100,0.2)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = "red";
+      ctx.fillRect(canvas.width * (vueapp.time / vueapp.totalTime),
+        (canvas.height - rect_size) / 2.0,
+        rect_size, rect_size);
+    }
+
+    draw();
+
+
+    let updatePeriod = 1/60;
+
+    let timeline = document.getElementById("timeline-slider");
+    var changing = false;
+    timeline.addEventListener("mousedown", function () {
+      changing = true;
+    });
+    timeline.addEventListener("mouseup", function () {
+      changing = false;
+    });
+
+    function doSomething() {
+      if (!changing && vueapp.isPlaying) {
+        vueapp.time += updatePeriod * vueapp.speed;
+        vueapp.time = Math.max(0, vueapp.time);
+        if (vueapp.time > vueapp.totalTime) {
+          vueapp.time = 0;
+        }
       }
+      draw();
     }
-  });
-
-
-  let updatePeriod = 1/60;
-
-  let timeline = document.getElementById("timeline-slider");
-  var changing = false;
-  timeline.addEventListener("mousedown", function () {
-    changing = true;
-  });
-  timeline.addEventListener("mouseup", function () {
-    changing = false;
-  });
-
-  function doSomething() {
-    if (!changing && vueapp.isPlaying) {
-      vueapp.time += updatePeriod * vueapp.speed;
-      vueapp.time = Math.max(0, Math.min(vueapp.time, vueapp.totalTime));
-    }
-  }
-  doSomething();
-  setInterval(doSomething, updatePeriod * 1000);
+    doSomething();
+    setInterval(doSomething, updatePeriod * 1000);
 
 
 </script>
